@@ -1,0 +1,27 @@
+{
+    "manifest_version": 3,
+    "name": "Revolut Workflow Enhancer",
+    "version": "1.0",
+    "description": "Add a sidebar to enhance Revolut workflows.",
+    "permissions": [
+        "tabs",
+        "webNavigation"
+    ],
+    "host_permissions": [
+        "https://*.revolut.com/*"
+    ],
+    "content_scripts": [
+        {
+            "matches": [
+                "https://*.revolut.com/expenses*"
+            ],
+            "js": [
+                "content.js"
+            ],
+            "css": [
+                "styles.css"
+            ],
+            "run_at": "document_end"
+        }
+    ]
+}
