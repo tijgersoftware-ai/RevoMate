@@ -97,6 +97,8 @@ sidebar.innerHTML = `
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
+          line-height: 1.2;
+          padding: 4px 0;
         ">RevoMate Sources</h1>
       </div>
     </div>
