@@ -149,10 +149,10 @@ sidebar.innerHTML = `
                 gap: 12px;
                 min-width: 0;
                 flex: 1;
-                transition: opacity 0.2s ease;
+                transition: filter 0.2s ease;
               "
-              onmouseover="this.style.opacity='0.7'"
-              onmouseout="this.style.opacity='1'"
+              onmouseover="this.style.filter='brightness(1.3)'"
+              onmouseout="this.style.filter='brightness(1)'"
             >
               <svg 
                 width="16" 
@@ -179,10 +179,10 @@ sidebar.innerHTML = `
                 color: white;
                 cursor: pointer;
                 padding: 4px;
-                transition: opacity 0.2s ease;
+                transition: filter 0.2s ease;
               "
-              onmouseover="this.style.opacity='0.7'"
-              onmouseout="this.style.opacity='1'"
+              onmouseover="this.style.filter='brightness(1.3)'"
+              onmouseout="this.style.filter='brightness(1)'"
             >
               <svg
                 width="16"
