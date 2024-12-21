@@ -1,8 +1,27 @@
 {
     "manifest_version": 3,
-    "name": "Revolut Mate",
+    "name": "RevoMate - Expense Source Manager for Revolut",
     "version": "1.0",
-    "description": "Revolut Mate is a Chrome extension that enhances Revolut workflows.",
+    "description": "[UNOFFICIAL TOOL] RevoMate is a third-party extension that streamlines your expense management workflow by providing quick access to your invoice sources directly within Revolut's expense interface. This extension adds a convenient sidebar that: • Organizes all your invoice source websites in one place • Provides instant access to platforms where your invoices are stored • Appears automatically when viewing expenses in Revolut • Allows quick searching through your saved sources • Lets you add, remove, and manage invoice source links • Works seamlessly within Revolut's expense interface • Stores all data locally for maximum privacy. Perfect for business users, accountants, and anyone managing expenses in Revolut who needs quick access to their invoice sources. Note: This extension is not affiliated with, endorsed by, or connected to Revolut in any way.",
+    "author": "Tijger Software",
+    "homepage_url": "https://github.com/tijgersoftware-ai/RevoMate",
+    "support": {
+        "url": "https://github.com/tijgersoftware-ai/RevoMate/issues",
+        "email": "ghamelink@tijgersoftware.com"
+    },
+    "icons": {
+        "333": "icons/icon333.png"
+    },
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "icons/*"
+            ],
+            "matches": [
+                "https://*.revolut.com/*"
+            ]
+        }
+    ],
     "permissions": [
         "tabs",
         "webNavigation"

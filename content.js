@@ -6,34 +6,34 @@ invoiceSources = storedSources;
 
 // Create function to check if we should show the sidebar
 function shouldShowSidebar() {
-    // if data-rui="page-top-nav" is present, then show the sidebar and
-    return window.location.pathname.includes('/expense');
+  // if data-rui="page-top-nav" is present, then show the sidebar and
+  return window.location.pathname.includes('/expense');
 }
 
 // Create function to handle sidebar visibility
 function updateSidebarVisibility() {
-    const sidebar = document.getElementById('custom-sidebar');
-    if (!sidebar) return;
+  const sidebar = document.getElementById('custom-sidebar');
+  if (!sidebar) return;
 
-    if (shouldShowSidebar()) {
-        sidebar.style.display = 'block';
-        document.body.style.marginRight = '300px';
-        initializeSidebarFunctionality();
-    } else {
-        sidebar.style.display = 'none';
-        document.body.style.marginRight = '0';
-    }
+  if (shouldShowSidebar()) {
+    sidebar.style.display = 'block';
+    document.body.style.marginRight = '300px';
+    initializeSidebarFunctionality();
+  } else {
+    sidebar.style.display = 'none';
+    document.body.style.marginRight = '0';
+  }
 }
 
 // Set up URL monitoring
 const observer = new MutationObserver((mutations) => {
-    updateSidebarVisibility();
+  updateSidebarVisibility();
 });
 
 // Start observing the document body for URL changes
 observer.observe(document.body, {
-    childList: true,
-    subtree: true
+  childList: true,
+  subtree: true
 });
 
 // Create the sidebar only if we're on the correct page
@@ -72,18 +72,33 @@ sidebar.innerHTML = `
       padding-top: 24px;
 
     ">
-      <h1 style="
-        font-size: 24px;
-        font-weight: 500;
-        color: white;
-        margin: 0;
-        min-width: 0;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+      <div style="
+        display: flex;
+        align-items: center;
+        gap: 12px;
         padding-bottom: 16px;
         margin-bottom: 16px;
-      ">Expense Sources</h1>
+      ">
+        <img 
+          src="${chrome.runtime.getURL('icons/icon333.png')}" 
+          alt="RevoMate"
+          style="
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+          "
+        />
+        <h1 style="
+          font-size: 24px;
+          font-weight: 500;
+          color: white;
+          margin: 0;
+          min-width: 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        ">RevoMate Sources</h1>
+      </div>
     </div>
 
     <!-- Add container for search and links -->
@@ -302,28 +317,28 @@ updateSidebarVisibility();
 
 
 function deleteSource(index, value) {
-    // check if mutation observer is targeting new value
+  // check if mutation observer is targeting new value
 
-    // Load the current state directly from localStorage
-    const storedSources = JSON.parse(localStorage.getItem('invoiceSources') || '[]');
-    console.log('storedSources:', storedSources);
-    console.log('value:', value);
-    // find the index of the value in the storedSources array
-    index = storedSources.findIndex(source => source.url === value.url);
-    if (index !== -1) {
-        console.log('Before deletion:', storedSources);
-        console.log('Deleting index:', index);
+  // Load the current state directly from localStorage
+  const storedSources = JSON.parse(localStorage.getItem('invoiceSources') || '[]');
+  console.log('storedSources:', storedSources);
+  console.log('value:', value);
+  // find the index of the value in the storedSources array
+  index = storedSources.findIndex(source => source.url === value.url);
+  if (index !== -1) {
+    console.log('Before deletion:', storedSources);
+    console.log('Deleting index:', index);
 
-        // Remove the source at the specified index
-        storedSources.splice(index, 1);
-        console.log('After deletion:', storedSources);
+    // Remove the source at the specified index
+    storedSources.splice(index, 1);
+    console.log('After deletion:', storedSources);
 
-        // Update localStorage
-        localStorage.setItem('invoiceSources', JSON.stringify(storedSources));
-        window.location.reload();
-    }
-    // Reload the page to reflect changes
-    //
+    // Update localStorage
+    localStorage.setItem('invoiceSources', JSON.stringify(storedSources));
+    window.location.reload();
+  }
+  // Reload the page to reflect changes
+  //
 }
 
 // Add popup functionality
@@ -334,81 +349,173 @@ const cancelButton = document.getElementById('cancel-add-source');
 const addSourceForm = document.getElementById('add-source-form');
 
 function showPopup() {
-    addSourcePopup.style.display = 'block';
-    overlay.style.display = 'block';
+  addSourcePopup.style.display = 'block';
+  overlay.style.display = 'block';
 }
 
 function hidePopup() {
-    addSourcePopup.style.display = 'none';
-    overlay.style.display = 'none';
-    addSourceForm.reset();
+  addSourcePopup.style.display = 'none';
+  overlay.style.display = 'none';
+  addSourceForm.reset();
 }
 
 addSourceButton.addEventListener('click', showPopup);
 overlay.addEventListener('click', hidePopup);
 cancelButton.addEventListener('click', hidePopup);
 
+// Add validation functions
+function isValidUrl(string) {
+  try {
+    const url = new URL(string);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch (_) {
+    return false;
+  }
+}
+
+function validateSource(name, url) {
+  const errors = [];
+
+  // Validate name
+  if (!name.trim()) {
+    errors.push("Name is required");
+  }
+  if (name.length > 50) {
+    errors.push("Name must be less than 50 characters");
+  }
+
+  // Validate URL
+  if (!url.trim()) {
+    errors.push("URL is required");
+  }
+  if (!isValidUrl(url)) {
+    errors.push("Please enter a valid URL (starting with http:// or https://)");
+  }
+
+  // Check for duplicates
+  const storedSources = JSON.parse(localStorage.getItem('invoiceSources') || '[]');
+  if (storedSources.some(source => source.url === url)) {
+    errors.push("This URL already exists in your sources");
+  }
+
+  return errors;
+}
+
+// Update form submission with validation
 addSourceForm.addEventListener('submit', (event) => {
-    event.preventDefault();
-    const newSource = {
-        name: document.getElementById('new-source-name').value,
-        url: document.getElementById('new-source-url').value
-    };
-    invoiceSources.unshift(newSource);
-    localStorage.setItem('invoiceSources', JSON.stringify(invoiceSources));
+  event.preventDefault();
+
+  const nameInput = document.getElementById('new-source-name');
+  const urlInput = document.getElementById('new-source-url');
+  const name = nameInput.value.trim();
+  const url = urlInput.value.trim();
+
+  // Remove any existing error messages
+  const existingError = document.getElementById('source-form-error');
+  if (existingError) {
+    existingError.remove();
+  }
+
+  // Validate inputs
+  const errors = validateSource(name, url);
+
+  if (errors.length > 0) {
+    // Create and show error message
+    const errorDiv = document.createElement('div');
+    errorDiv.id = 'source-form-error';
+    errorDiv.style.cssText = `
+      color: #ff4444;
+      font-size: 14px;
+      margin-bottom: 16px;
+      padding: 8px;
+      background: rgba(255, 68, 68, 0.1);
+      border-radius: 4px;
+    `;
+    errorDiv.innerHTML = errors.join('<br>');
+
+    // Insert error before the buttons
+    const buttonsDiv = addSourceForm.querySelector('div');
+    addSourceForm.insertBefore(errorDiv, buttonsDiv);
+    return;
+  }
+
+  try {
+    // Add new source
+    const newSource = { name, url };
+    const storedSources = JSON.parse(localStorage.getItem('invoiceSources') || '[]');
+    storedSources.unshift(newSource);
+    localStorage.setItem('invoiceSources', JSON.stringify(storedSources));
+
+    // Reset form and close popup
     hidePopup();
     window.location.reload();
+  } catch (error) {
+    console.error('Error saving source:', error);
+    const errorDiv = document.createElement('div');
+    errorDiv.id = 'source-form-error';
+    errorDiv.style.cssText = `
+      color: #ff4444;
+      font-size: 14px;
+      margin-bottom: 16px;
+      padding: 8px;
+      background: rgba(255, 68, 68, 0.1);
+      border-radius: 4px;
+    `;
+    errorDiv.textContent = 'Failed to save source. Please try again.';
+    const buttonsDiv = addSourceForm.querySelector('div');
+    addSourceForm.insertBefore(errorDiv, buttonsDiv);
+  }
 });
 
 // Function to load sources from localStorage
 
 // Create a function to initialize all sidebar functionality
 function initializeSidebarFunctionality() {
-    // Search functionality
-    const searchInput = document.getElementById('source-search');
-    if (searchInput) {
-        searchInput.style.cssText += `
+  // Search functionality
+  const searchInput = document.getElementById('source-search');
+  if (searchInput) {
+    searchInput.style.cssText += `
             ::placeholder {
                 color: white;
                 opacity: 0.7;
             }
         `;
 
-        searchInput.addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase();
-            const sourceContainers = document.querySelectorAll('#source-links > div');
-            sourceContainers.forEach(container => {
-                const link = container.querySelector('a');
-                const text = link.textContent.toLowerCase();
-                container.style.display = text.includes(searchTerm) ? 'flex' : 'none';
-            });
-        });
-    }
-
-    // Delete functionality
-    const deleteButtons = document.querySelectorAll('.delete-source');
-    deleteButtons.forEach(button => {
-        button.addEventListener('click', (e) => {
-            const index = parseInt(e.currentTarget.dataset.index);
-            const value = invoiceSources[index];
-
-            deleteSource(index, value);
-        });
+    searchInput.addEventListener('input', (e) => {
+      const searchTerm = e.target.value.toLowerCase();
+      const sourceContainers = document.querySelectorAll('#source-links > div');
+      sourceContainers.forEach(container => {
+        const link = container.querySelector('a');
+        const text = link.textContent.toLowerCase();
+        container.style.display = text.includes(searchTerm) ? 'flex' : 'none';
+      });
     });
+  }
 
-    // Link click tracking
-    const links = document.querySelectorAll('#source-links a');
-    links.forEach((link, index) => {
-        link.addEventListener('click', () => {
-            const storedSources = JSON.parse(localStorage.getItem('invoiceSources') || JSON.stringify(invoiceSources));
-            storedSources[index].lastVisited = new Date().toISOString();
-            localStorage.setItem('invoiceSources', JSON.stringify(storedSources));
-        });
+  // Delete functionality
+  const deleteButtons = document.querySelectorAll('.delete-source');
+  deleteButtons.forEach(button => {
+    button.addEventListener('click', (e) => {
+      const index = parseInt(e.currentTarget.dataset.index);
+      const value = invoiceSources[index];
+
+      deleteSource(index, value);
     });
+  });
+
+  // Link click tracking
+  const links = document.querySelectorAll('#source-links a');
+  links.forEach((link, index) => {
+    link.addEventListener('click', () => {
+      const storedSources = JSON.parse(localStorage.getItem('invoiceSources') || JSON.stringify(invoiceSources));
+      storedSources[index].lastVisited = new Date().toISOString();
+      localStorage.setItem('invoiceSources', JSON.stringify(storedSources));
+    });
+  });
 }
 
 // Call initializeSidebarFunctionality after creating the sidebar
 if (shouldShowSidebar()) {
-    // Initialize functionality after creating the sidebar
-    initializeSidebarFunctionality();
+  // Initialize functionality after creating the sidebar
+  initializeSidebarFunctionality();
 }
