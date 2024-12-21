@@ -37,17 +37,16 @@ observer.observe(document.body, {
 });
 
 // Create the sidebar only if we're on the correct page
-if (shouldShowSidebar()) {
-    // Create the sidebar container
-    const sidebar = document.createElement('div');
-    sidebar.id = 'custom-sidebar';
+// Create the sidebar container
+const sidebar = document.createElement('div');
+sidebar.id = 'custom-sidebar';
 
-    // Add the sidebar to the page
-    document.body.appendChild(sidebar);
+// Add the sidebar to the page
+document.body.appendChild(sidebar);
 
-    // Adjust the page layout to make room for the sidebar
-    document.body.style.marginRight = '300px';
-    sidebar.style.cssText = `
+// Adjust the page layout to make room for the sidebar
+document.body.style.marginRight = '300px';
+sidebar.style.cssText = `
     position: fixed;
     top: 0;
     right: 0;
@@ -61,10 +60,10 @@ if (shouldShowSidebar()) {
     color: white;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   `;
-    sidebar.id = 'custom-sidebar';
+sidebar.id = 'custom-sidebar';
 
-    // Create the sidebar content
-    sidebar.innerHTML = `
+// Create the sidebar content
+sidebar.innerHTML = `
     <div style="
       position: sticky;
       top: 0;
@@ -298,9 +297,9 @@ if (shouldShowSidebar()) {
    
   `;
 
-    // Initial visibility check
-    updateSidebarVisibility();
-}
+// Initial visibility check
+updateSidebarVisibility();
+
 
 function deleteSource(index, value) {
     // check if mutation observer is targeting new value
