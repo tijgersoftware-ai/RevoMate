@@ -382,20 +382,15 @@ function deleteSource(index, value) {
       // Update global state
       invoiceSources = [...storedSources];
 
-      // Check if it was the last item before deletion
-      if (index === storedSources.length) {
-        updateSourcesList(storedSources);
-      } else {
-        // Use direct DOM manipulation for non-last elements
-        const sourceLinks = document.getElementById('source-links');
-        if (sourceLinks) {
-          const sourceItem = sourceLinks.querySelector(`[data-index="${index}"]`);
-          if (sourceItem) {
-            sourceItem.closest('.source-item').remove();
-          } else {
-            // Fallback to full update if element not found
-            updateSourcesList(storedSources);
-          }
+      // Use direct DOM manipulation for non-last elements
+      const sourceLinks = document.getElementById('source-links');
+      if (sourceLinks) {
+        const sourceItem = sourceLinks.querySelector(`[data-index="${index}"]`);
+        if (sourceItem) {
+          sourceItem.closest('.source-item').remove();
+        } else {
+          // Fallback to full update if element not found
+          updateSourcesList(storedSources);
         }
       }
     }
