@@ -370,10 +370,13 @@ function deleteSource(index, value) {
       console.error('Invalid stored sources');
       return;
     }
-
-    // Remove the source
-    storedSources.splice(index, 1);
-
+    // add an alert to confirm deletion for the user with the source name and url
+    if (confirm(`Are you sure you want to delete ${value.name}?`)) {
+      // Remove the source
+      storedSources.splice(index, 1);
+    } else {
+      return;
+    }
     // Save updated sources
     if (saveStoredSources(storedSources)) {
       // Update global state
@@ -406,24 +409,24 @@ function deleteSource(index, value) {
 // Improve delete button initialization
 function initializeDeleteButtons() {
   const deleteButtons = document.querySelectorAll('.delete-source');
+  // First remove all existing listeners
   deleteButtons.forEach(button => {
-    // Remove any existing event listeners
-    const newButton = button.cloneNode(true);
-    button.parentNode.replaceChild(newButton, button);
+    const clone = button.cloneNode(true);
+    button.replaceWith(clone);
+  });
 
-    newButton.addEventListener('click', (e) => {
-      e.stopPropagation(); // Prevent event bubbling
+  // Then add fresh listeners
+  document.querySelectorAll('.delete-source').forEach(button => {
+    button.addEventListener('click', (e) => {
+      e.stopPropagation();
       const index = parseInt(e.currentTarget.dataset.index);
-
-      // Validate index and get corresponding source
       if (isNaN(index) || !invoiceSources[index]) {
         console.error('Invalid source index:', index);
         return;
       }
-
       const value = invoiceSources[index];
       deleteSource(index, value);
-    });
+    }, { once: true }); // Add once: true to ensure the listener only fires once
   });
 }
 
@@ -531,19 +534,6 @@ function updateSourcesList(sources) {
   } finally {
     isUpdating = false;
   }
-}
-
-// Separate function to initialize delete buttons
-function initializeDeleteButtons() {
-  const deleteButtons = document.querySelectorAll('.delete-source');
-  deleteButtons.forEach(button => {
-    button.addEventListener('click', (e) => {
-      e.stopPropagation(); // Prevent event bubbling
-      const index = parseInt(e.currentTarget.dataset.index);
-      const value = invoiceSources[index];
-      deleteSource(index, value);
-    });
-  });
 }
 
 // Update form submission to properly refresh the list
