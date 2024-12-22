@@ -370,27 +370,91 @@ function deleteSource(index, value) {
       console.error('Invalid stored sources');
       return;
     }
-    // add an alert to confirm deletion for the user with the source name and url
+
     if (confirm(`Are you sure you want to delete ${value.name}?`)) {
       // Remove the source
       storedSources.splice(index, 1);
-    } else {
-      return;
-    }
-    // Save updated sources
-    if (saveStoredSources(storedSources)) {
-      // Update global state
-      invoiceSources = [...storedSources];
 
-      // Use direct DOM manipulation for non-last elements
-      const sourceLinks = document.getElementById('source-links');
-      if (sourceLinks) {
-        const sourceItem = sourceLinks.querySelector(`[data-index="${index}"]`);
-        if (sourceItem) {
-          sourceItem.closest('.source-item').remove();
-        } else {
-          // Fallback to full update if element not found
-          updateSourcesList(storedSources);
+      // Save updated sources and update UI
+      if (saveStoredSources(storedSources)) {
+        // Update global state
+        invoiceSources = [...storedSources];
+        // Always force a full UI refresh after deletion
+        const sourceLinks = document.getElementById('source-links');
+        if (sourceLinks) {
+          sourceLinks.innerHTML = invoiceSources.map((source, idx) => `
+            <div class="source-item" style="
+              display: flex; 
+              align-items: center; 
+              justify-content: space-between;
+              background: ${idx % 2 !== 0 ? '#232f39' : 'transparent'};
+              padding: 8px;
+              border-radius: 6px;
+              width: 100%;
+            ">
+              <a 
+                href="${source.url}" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                style="
+                  display: flex;
+                  align-items: center;
+                  text-decoration: none;
+                  color: white;
+                  font-size: 14px;
+                  gap: 12px;
+                  min-width: 0;
+                  flex: 1;
+                  transition: filter 0.2s ease;
+                "
+                onmouseover="this.style.filter='brightness(1.3)'"
+                onmouseout="this.style.filter='brightness(1)'"
+              >
+                <svg 
+                  width="16" 
+                  height="16" 
+                  viewBox="0 0 24 24" 
+                  fill="none"
+                  stroke="currentColor"
+                  style="min-width: 16px; flex-shrink: 0;"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                </svg>
+                <span style="
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  white-space: nowrap;
+                ">${source.name}</span>
+              </a>
+              <button
+                class="delete-source"
+                data-index="${idx}"
+                style="
+                  background: none;
+                  border: none;
+                  color: white;
+                  cursor: pointer;
+                  padding: 4px;
+                  transition: filter 0.2s ease;
+                "
+                onmouseover="this.style.filter='brightness(1.3)'"
+                onmouseout="this.style.filter='brightness(1)'"
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+            </div>
+          `).join('');
+
+          // Reinitialize delete buttons after updating the UI
+          initializeDeleteButtons();
         }
       }
     }
